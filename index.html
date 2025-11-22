@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphle - Daily Math Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #262624;
+            color: #faf9f5;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            transform: translateX(0);
+            text-align: center;
+            z-index: 10;
+            background: rgba(26, 26, 24, 0.95);
+            padding: 15px 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #faf9f5;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 8px;
+            background: #262624;
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .mode-btn.active {
+            background: #c6613f;
+            color: #faf9f5;
+        }
+
+        .difficulty-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .diff-btn {
+            padding: 8px 12px;
+            background: #262624;
+            border: 2px solid #333;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .diff-btn.active {
+            border-color: #c6613f;
+            color: #c6613f;
+        }
+
+        #calculator {
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .controls-panel {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 380px;
+            max-height: 85vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 20;
+        }
+
+        .stats {
+            background: rgba(26, 26, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c6613f;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .input-section {
+            background: rgba(26, 26, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #faf9f5;
+        }
+
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #262624;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #faf9f5;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #c6613f;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit {
+            background: #c6613f;
+            color: #faf9f5;
+        }
+
+        .btn-submit:hover {
+            background: #b55535;
+            transform: translateY(-2px);
+        }
+
+        .btn-new {
+            background: #333;
+            color: #faf9f5;
+        }
+
+        .btn-new:hover {
+            background: #444;
+        }
+
+        .feedback {
+            background: rgba(26, 26, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 18px;
+            min-height: 120px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .feedback-content {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .success {
+            color: #4caf50;
+        }
+
+        .error {
+            color: #c6613f;
+        }
+
+        .info {
+            color: #aaa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+
+        .share-section {
+            background: rgba(26, 26, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .share-link {
+            width: 100%;
+            padding: 12px;
+            background: #262624;
+            border: 2px solid #c6613f;
+            border-radius: 8px;
+            color: #faf9f5;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+            word-break: break-all;
+        }
+
+        .btn-copy {
+            width: 100%;
+            margin-top: 8px;
+            background: #c6613f;
+            color: #faf9f5;
+        }
+
+        .btn-copy:hover {
+            background: #b55535;
+        }
+
+        #createMode, #playMode, #dailyMode, #practiceMode {
+            display: none;
+        }
+
+        #createMode.active, #playMode.active, #dailyMode.active, #practiceMode.active {
+            display: contents;
+        }
+
+        .daily-info {
+            background: rgba(26, 26, 24, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .daily-date {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .controls-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .controls-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 4px;
+        }
+
+        .controls-panel::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        @media (max-width: 1200px) {
+            .controls-panel {
+                right: 15px;
+                width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .controls-panel {
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                top: auto;
+                transform: none;
+                width: 100%;
+                max-height: 50vh;
+                border-radius: 20px 20px 0 0;
+                padding: 15px;
+                background: rgba(26, 26, 24, 0.98);
+            }
+
+            .header {
+                top: 10px;
+                padding: 10px 20px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Graphle</h1>
+        <p class="subtitle">Guess the mathematical function</p>
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('daily')">Daily</button>
+            <button class="mode-btn" onclick="switchMode('practice')">Practice</button>
+            <button class="mode-btn" onclick="switchMode('create')">Create</button>
+        </div>
+    </div>
+
+    <div id="calculator"></div>
+
+    <div class="controls-panel">
+        <!-- DAILY MODE -->
+        <div id="dailyMode" class="active">
+            <div class="daily-info">
+                <div class="daily-date" id="dailyDate">Loading...</div>
+                <div class="difficulty-selector">
+                    <button class="diff-btn active" onclick="selectDifficulty('easy')">Easy</button>
+                    <button class="diff-btn" onclick="selectDifficulty('medium')">Medium</button>
+                    <button class="diff-btn" onclick="selectDifficulty('hard')">Hard</button>
+                    <button class="diff-btn" onclick="selectDifficulty('very_hard')">Very Hard</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="attempts">0</div>
+                    <div class="stat-label">Attempts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="hintsLeft">2</div>
+                    <div class="stat-label">Hints Left</div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="section-title">Your Guess</div>
+                <div class="input-wrapper">
+                    <input type="text" id="guessInput" placeholder="e.g., 5*x^2+10*sin(2*x)-20">
+                    <div class="hint">Use: +, -, *, ^, sin(), cos(), log(), sqrt()</div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-submit" onclick="submitGuess()">Submit</button>
+                    <button class="btn-new" onclick="getHint()">Hint</button>
+                    <button class="btn-new" onclick="loadDailyChallenge()">Reset</button>
+                </div>
+            </div>
+
+            <div class="feedback">
+                <div class="section-title">Feedback</div>
+                <div class="feedback-content" id="feedback">
+                    <p class="info">Loading today's challenge...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRACTICE MODE -->
+        <div id="practiceMode">
+            <div class="daily-info">
+                <div class="section-title">Practice Mode</div>
+                <div class="difficulty-selector">
+                    <button class="diff-btn active" onclick="selectPracticeDifficulty('easy')">Easy</button>
+                    <button class="diff-btn" onclick="selectPracticeDifficulty('medium')">Medium</button>
+                    <button class="diff-btn" onclick="selectPracticeDifficulty('hard')">Hard</button>
+                    <button class="diff-btn" onclick="selectPracticeDifficulty('very_hard')">Very Hard</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="practiceScore">0</div>
+                    <div class="stat-label">Score</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="practiceAttempts">0</div>
+                    <div class="stat-label">Attempts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="practiceHintsLeft">2</div>
+                    <div class="stat-label">Hints Left</div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <div class="section-title">Your Guess</div>
+                <div class="input-wrapper">
+                    <input type="text" id="practiceGuessInput" placeholder="e.g., 5*x^2+10*sin(2*x)-20">
+                    <div class="hint">Use: +, -, *, ^, sin(), cos(), log(), sqrt()</div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-submit" onclick="submitPracticeGuess()">Submit</button>
+                    <button class="btn-new" onclick="getPracticeHint()">Hint</button>
+                    <button class="btn-new" onclick="newPracticeGame()">New</button>
+                </div>
+            </div>
+
+            <div class="feedback">
+                <div class="section-title">Feedback</div>
+                <div class="feedback-content" id="practiceFeedback">
+                    <p class="info">Select a difficulty to start!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATE MODE -->
+        <div id="createMode">
+            <div class="input-section">
+                <div class="section-title">Create Your Function</div>
+                <div class="input-wrapper">
+                    <input type="text" id="createInput" placeholder="e.g., 5*x^2+10*sin(2*x)-20">
+                    <div class="hint">Type to see your function on the graph in real-time!</div>
+                </div>
+            </div>
+
+            <div class="share-section">
+                <div class="section-title">Share Challenge</div>
+                <div class="feedback-content">
+                    <p class="info" id="shareInfo">Create a function - it will appear on the graph as you type!</p>
+                    <div id="shareLinkContainer" style="display: none;">
+                        <input type="text" id="shareLink" class="share-link" readonly>
+                        <button class="btn-copy" onclick="copyShareLink()">Copy Link</button>
+                    </div>
+                </div>
+                <button class="btn-submit" onclick="generateShareLink()" style="width: 100%; margin-top: 10px;">Generate Share Link</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.desmos.com/api/v1.9/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+    <script src="app.js"></script>
+</body>
+</html>
