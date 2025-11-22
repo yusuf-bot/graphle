@@ -49,43 +49,53 @@ function generateFunction(difficulty, seed = Math.random()) {
     let operations, num_terms;
     
     if (difficulty === 'easy') {
+        // Easy: 2 terms, all function types, small coefficients, simple arguments
         operations = [
             () => `${randInt(1, 5)}x`,
-            () => `${randInt(1, 3)}x^{2}`,
-            () => `${randInt(5, 15)}\\sin(x)`,
-            () => `${randInt(5, 15)}\\cos(x)`,
+            () => `${randInt(1, 5)}x^{2}`,
+            () => `${randInt(3, 10)}\\sin(x)`,
+            () => `${randInt(3, 10)}\\cos(x)`,
+            () => `${randInt(2, 5)}\\ln(x+${randInt(1, 3)})`,
+            () => `${randInt(2, 5)}^{x}`,
+            () => `\\sqrt{${randInt(5, 20)}x}`,
         ];
-        num_terms = randInt(1, 2);
+        num_terms = 2;
     } else if (difficulty === 'medium') {
+        // Medium: 2-3 terms, all functions, moderate coefficients, can have 2x multipliers
         operations = [
-            () => `${randInt(2, 8)}x`,
-            () => `${randInt(1, 4)}x^{2}`,
-            () => `${randInt(10, 30)}\\sin(${randInt(1, 2)}x)`,
-            () => `${randInt(10, 30)}\\cos(${randInt(1, 2)}x)`,
-            () => `${randInt(5, 15)}\\ln(x+${randInt(1, 3)})`,
+            () => `${randInt(5, 15)}x`,
+            () => `${randInt(2, 8)}x^{2}`,
+            () => `${randInt(8, 20)}\\sin(${randInt(1, 2)}x)`,
+            () => `${randInt(8, 20)}\\cos(${randInt(1, 2)}x)`,
+            () => `${randInt(3, 10)}\\ln(x+${randInt(2, 5)})`,
+            () => `${randInt(2, 4)}^{x}`,
+            () => `\\sqrt{${randInt(10, 40)}x}`,
         ];
         num_terms = randInt(2, 3);
     } else if (difficulty === 'hard') {
+        // Hard: 3 terms, larger coefficients, complex arguments (3x), larger offsets
         operations = [
-            () => `${randInt(3, 10)}x`,
-            () => `${randInt(1, 5)}x^{2}`,
-            () => `${randInt(15, 40)}\\sin(${randInt(1, 3)}x)`,
-            () => `${randInt(15, 40)}\\cos(${randInt(1, 3)}x)`,
-            () => `${randInt(8, 20)}\\ln(x+${randInt(1, 5)})`,
-            () => `\\sqrt{${randInt(20, 80)}x}`,
-        ];
-        num_terms = randInt(2, 3);
-    } else { // very_hard
-        operations = [
-            () => `${randInt(2, 10)}x`,
-            () => `${randInt(1, 5)}x^{2}`,
-            () => `${randInt(10, 50)}\\sin(${randInt(1, 3)}x)`,
-            () => `${randInt(10, 50)}\\cos(${randInt(1, 3)}x)`,
-            () => `${randInt(5, 20)}\\ln(x+${randInt(1, 5)})`,
+            () => `${randInt(10, 30)}x`,
+            () => `${randInt(3, 10)}x^{2}`,
+            () => `${randInt(15, 35)}\\sin(${randInt(2, 3)}x)`,
+            () => `${randInt(15, 35)}\\cos(${randInt(2, 3)}x)`,
+            () => `${randInt(5, 20)}\\ln(x+${randInt(3, 8)})`,
             () => `${randInt(2, 5)}^{x}`,
-            () => `\\sqrt{${randInt(10, 100)}x}`,
+            () => `\\sqrt{${randInt(20, 80)}x+${randInt(5, 20)}}`,
         ];
-        num_terms = randInt(3, 4);
+        num_terms = 3;
+    } else { // very_hard
+        // Very Hard: 4 terms, large coefficients, complex combinations
+        operations = [
+            () => `${randInt(15, 40)}x`,
+            () => `${randInt(5, 15)}x^{2}`,
+            () => `${randInt(20, 50)}\\sin(${randInt(2, 4)}x)`,
+            () => `${randInt(20, 50)}\\cos(${randInt(2, 4)}x)`,
+            () => `${randInt(10, 30)}\\ln(x+${randInt(5, 12)})`,
+            () => `${randInt(2, 5)}^{x}`,
+            () => `\\sqrt{${randInt(30, 100)}x+${randInt(10, 30)}}`,
+        ];
+        num_terms = 4;
     }
     
     // Shuffle and select operations
@@ -100,10 +110,17 @@ function generateFunction(difficulty, seed = Math.random()) {
         result += op + terms[i];
     }
     
-    // Add offset
-    if (difficulty !== 'easy') {
-        const offset_ranges = { medium: 30, hard: 50, very_hard: 50 };
-        const offset = randInt(-offset_ranges[difficulty], offset_ranges[difficulty]);
+    // Add offset based on difficulty
+    const offset_ranges = { 
+        easy: { min: 5, max: 15 }, 
+        medium: { min: 10, max: 30 },
+        hard: { min: 20, max: 50 },
+        very_hard: { min: 30, max: 80 }
+    };
+    
+    if (offset_ranges[difficulty]) {
+        const range = offset_ranges[difficulty];
+        const offset = random() > 0.5 ? randInt(range.min, range.max) : -randInt(range.min, range.max);
         if (offset !== 0) {
             result += (offset > 0 ? '+' : '') + offset;
         }
